@@ -2,7 +2,7 @@
 Contributors: insationtech
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 
 Customers pick a SanMar product, colour and size quantities, upload their logo, see a live mockup on the real product photo, and send a quote request. No prices are shown.
@@ -16,7 +16,7 @@ Customers pick a SanMar product, colour and size quantities, upload their logo, 
 
 == How it works ==
 
-* Product data and image paths come from the SanMar Data Library. Product photos are loaded from SanMar's image server through a small same-origin cache (wp-content/uploads/iaq-cache) so the mockup can be saved as an image.
+* Product data and image paths come from the SanMar Data Library. All product photos are downloaded to the site (wp-content/uploads/iaq-cache) by a background job and served from there. Only resized copies are kept: 800, 300 and 150 px for the front photo, 800 px for the back (about 2.4 GB for the full catalog). Progress is shown in Settings.
 * The mockup is drawn in the customer's browser: their actual logo file placed in the print area on SanMar's flat product photo. Customers can drag and resize it. White backgrounds are removed automatically when detected.
 * On submit, the shop gets an email with the order details, the logo file and one mockup image per side used (Reply-To is the customer). The customer gets a copy with their mockups.
 * Requests are saved under Quote Requests in WP Admin with a status (New / Quote sent / Ordered / Closed). Uploaded files are stored in wp-content/uploads/iaq-quotes, which is closed to the public, and can be opened from the request screen.
