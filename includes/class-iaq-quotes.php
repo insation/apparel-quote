@@ -281,7 +281,6 @@ class IAQ_Quotes {
 			return self::err( sprintf( 'Please enter at least one size quantity for %s.', $style['s'] ) );
 		}
 		$methods = array(
-			'screen'     => 'Screen printing',
 			'embroidery' => 'Embroidery',
 			'dtf'        => 'DTF / heat transfer',
 			'unsure'     => 'Not sure - recommend',
