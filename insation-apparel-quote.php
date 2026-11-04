@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Apparel Quote & Mockup (SanMar)
  * Description:       Customers pick a SanMar product, colour and size quantities, upload their logo, see a live mockup and send a quote request. No prices are shown. Shortcode: [apparel_quote]
- * Version:           1.0.3
+ * Version:           1.0.4
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Insation Technologies
@@ -13,7 +13,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'IAQ_VERSION', '1.0.3' );
+define( 'IAQ_VERSION', '1.0.4' );
 define( 'IAQ_FILE', __FILE__ );
 define( 'IAQ_DIR', plugin_dir_path( __FILE__ ) );
 define( 'IAQ_URL', plugin_dir_url( __FILE__ ) );
