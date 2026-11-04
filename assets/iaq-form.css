@@ -1,0 +1,168 @@
+/* Apparel Quote & Mockup - scoped to .iaq */
+.iaq {
+	--iaq-accent: #EB4926;
+	--iaq-accent-dark: #C73C1D;
+	--iaq-ink: #28292A;
+	--iaq-muted: #6b6f74;
+	--iaq-line: #e3e0da;
+	--iaq-soft: #f7f5f1;
+	--iaq-radius: 14px;
+	color: var(--iaq-ink);
+	font-size: 16px;
+	line-height: 1.5;
+	max-width: 1200px;
+	margin: 0 auto;
+}
+.iaq *, .iaq *::before, .iaq *::after { box-sizing: border-box; }
+.iaq[data-loading] { opacity: .6; pointer-events: none; }
+.iaq-loading { padding: 40px; text-align: center; color: var(--iaq-muted); }
+.iaq-intro { font-size: 17px; margin: 0 0 18px; color: var(--iaq-muted); }
+
+/* Buttons */
+.iaq .iaq-btn {
+	display: inline-flex; align-items: center; justify-content: center; gap: 6px; position: relative; overflow: hidden;
+	padding: 10px 18px; border: 1.5px solid var(--iaq-ink); border-radius: 999px; background: #fff; color: var(--iaq-ink);
+	font: inherit; font-weight: 600; font-size: 15px; line-height: 1.2; cursor: pointer; text-decoration: none; transition: background .15s, color .15s, border-color .15s;
+}
+.iaq .iaq-btn:hover { background: var(--iaq-ink); color: #fff; }
+.iaq .iaq-btn-primary { background: var(--iaq-accent); border-color: var(--iaq-accent); color: #fff; }
+.iaq .iaq-btn-primary:hover { background: var(--iaq-accent-dark); border-color: var(--iaq-accent-dark); color: #fff; }
+.iaq .iaq-btn:disabled { opacity: .55; cursor: default; }
+.iaq .iaq-btn-sm { padding: 7px 14px; font-size: 14px; }
+.iaq .iaq-btn-lg { padding: 14px 28px; font-size: 17px; }
+.iaq .iaq-link { background: none; border: 0; padding: 4px 0; color: var(--iaq-accent); font: inherit; font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.iaq .iaq-link:hover { color: var(--iaq-accent-dark); background: none; }
+.iaq .iaq-danger { color: #a33; }
+.iaq .iaq-file { position: absolute; inset: 0; opacity: 0; cursor: pointer; font-size: 0; }
+.iaq .iaq-mt { margin-top: 8px; }
+
+/* Steps + cart bar */
+.iaq-steps { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 0 0 18px; font-size: 14px; color: var(--iaq-muted); }
+.iaq-step { display: inline-flex; align-items: center; gap: 8px; }
+.iaq-step b { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--iaq-line); color: var(--iaq-ink); font-size: 13px; }
+.iaq-step.is-on { color: var(--iaq-ink); font-weight: 600; }
+.iaq-step.is-on b { background: var(--iaq-accent); color: #fff; }
+.iaq-cartbar {
+	position: sticky; top: 10px; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
+	padding: 10px 12px 10px 18px; margin: 0 0 18px; background: var(--iaq-ink); color: #fff; border-radius: 999px; box-shadow: 0 6px 20px rgba(0,0,0,.12);
+}
+
+/* Browse */
+.iaq .iaq-search {
+	width: 100%; padding: 14px 18px; border: 1.5px solid var(--iaq-line); border-radius: 999px; font: inherit; font-size: 16px; background: #fff; color: var(--iaq-ink);
+}
+.iaq .iaq-search:focus { outline: none; border-color: var(--iaq-accent); }
+.iaq-pills { display: flex; gap: 8px; margin: 14px 0 6px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
+.iaq .iaq-pill {
+	flex: 0 0 auto; padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--iaq-line); background: #fff; color: var(--iaq-ink);
+	font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap;
+}
+.iaq .iaq-pill:hover { border-color: var(--iaq-ink); background: #fff; color: var(--iaq-ink); }
+.iaq .iaq-pill.is-on { background: var(--iaq-ink); border-color: var(--iaq-ink); color: #fff; }
+.iaq-count { font-size: 14px; color: var(--iaq-muted); margin: 6px 0 12px; }
+.iaq-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; }
+.iaq .iaq-card {
+	position: relative; display: flex; flex-direction: column; align-items: stretch; text-align: left; gap: 4px; padding: 10px 10px 14px;
+	background: #fff; border: 1.5px solid var(--iaq-line); border-radius: var(--iaq-radius); cursor: pointer; font: inherit; color: var(--iaq-ink);
+	transition: border-color .15s, transform .15s, box-shadow .15s;
+}
+.iaq .iaq-card:hover { border-color: var(--iaq-accent); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.07); background: #fff; color: var(--iaq-ink); }
+.iaq .iaq-card span { white-space: normal; overflow-wrap: anywhere; }
+.iaq-card-img { display: block; aspect-ratio: 1 / 1; border-radius: 10px; background: var(--iaq-soft); overflow: hidden; margin-bottom: 6px; }
+.iaq-card-img img { width: 100%; height: 100%; object-fit: contain; display: block; mix-blend-mode: multiply; }
+.iaq-card-brand { font-size: 12px; color: var(--iaq-muted); text-transform: uppercase; letter-spacing: .03em; }
+.iaq-card-title { font-size: 15px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.iaq-card-meta { font-size: 13px; color: var(--iaq-muted); }
+.iaq-badge { position: absolute; top: 16px; left: 16px; background: var(--iaq-accent); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+.iaq-more { text-align: center; margin: 22px 0 6px; }
+.iaq-empty { padding: 30px; text-align: center; color: var(--iaq-muted); }
+
+/* Product */
+.iaq-product { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 32px; margin-top: 10px; align-items: start; }
+.iaq-stage { position: sticky; top: 74px; }
+.iaq-canvas-wrap { background: var(--iaq-soft); border-radius: var(--iaq-radius); padding: 10px; margin-top: 10px; }
+.iaq-canvas { display: block; width: 100%; height: auto; border-radius: 10px; background: #fff; touch-action: none; }
+.iaq-canvas.is-loading { opacity: .4; }
+.iaq-stage-note { font-size: 14px; color: var(--iaq-muted); margin: 10px 2px; min-height: 21px; }
+.iaq-size-row { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; margin: 4px 2px 12px; }
+.iaq-size-row input { flex: 1; accent-color: var(--iaq-accent); }
+.iaq-seg { display: inline-flex; border: 1.5px solid var(--iaq-line); border-radius: 999px; padding: 3px; background: #fff; }
+.iaq .iaq-seg-btn { border: 0; background: none; padding: 6px 16px; border-radius: 999px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; color: var(--iaq-ink); }
+.iaq .iaq-seg-btn:hover { background: var(--iaq-soft); color: var(--iaq-ink); }
+.iaq .iaq-seg-btn.is-on { background: var(--iaq-ink); color: #fff; }
+.iaq .iaq-seg-btn:disabled { opacity: .35; cursor: default; }
+
+.iaq-logo { margin-top: 6px; }
+.iaq-drop {
+	position: relative; display: flex; flex-direction: column; gap: 4px; padding: 18px 20px; border: 2px dashed #cfcac2; border-radius: var(--iaq-radius);
+	background: #fff; cursor: pointer; text-align: center; transition: border-color .15s, background .15s;
+}
+.iaq-drop strong { font-size: 16px; }
+.iaq-drop span { font-size: 13px; color: var(--iaq-muted); }
+.iaq-drop:hover, .iaq-logo.is-drag .iaq-drop { border-color: var(--iaq-accent); background: #fff8f5; }
+.iaq-logo-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1.5px solid var(--iaq-line); border-radius: 12px; background: #fff; }
+.iaq-logo-thumb { flex: 0 0 auto; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 8px;
+	background: repeating-conic-gradient(#eee 0 25%, #fff 0 50%) 50% / 12px 12px; }
+.iaq-logo-thumb canvas { max-width: 48px; max-height: 48px; }
+.iaq-logo-name { flex: 1; min-width: 0; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.iaq-brand { font-size: 13px; color: var(--iaq-muted); text-transform: uppercase; letter-spacing: .04em; }
+.iaq .iaq-title { margin: 4px 0 8px; font-size: 26px; line-height: 1.2; }
+.iaq-desc { font-size: 14px; color: var(--iaq-muted); margin-bottom: 8px; }
+.iaq-desc summary { cursor: pointer; font-weight: 600; color: var(--iaq-ink); }
+.iaq-group { padding: 16px 0; border-top: 1px solid var(--iaq-line); }
+.iaq-label { font-weight: 700; margin-bottom: 10px; }
+.iaq-colour-name { font-weight: 500; color: var(--iaq-muted); }
+.iaq-swatches { display: flex; flex-wrap: wrap; gap: 8px; max-height: 236px; overflow-y: auto; padding: 2px; }
+.iaq .iaq-sw { width: 52px; height: 52px; padding: 2px; border: 2px solid var(--iaq-line); border-radius: 10px; background: #fff; cursor: pointer; }
+.iaq .iaq-sw:hover { border-color: var(--iaq-ink); background: #fff; }
+.iaq .iaq-sw.is-on { border-color: var(--iaq-accent); box-shadow: 0 0 0 2px rgba(235,73,38,.25); }
+.iaq-sw img { width: 100%; height: 100%; object-fit: contain; display: block; mix-blend-mode: multiply; }
+.iaq-radios, .iaq-checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.iaq-radio, .iaq-check { display: flex; align-items: center; gap: 8px; font-size: 15px; cursor: pointer; }
+.iaq-radio input, .iaq-check input { width: 18px; height: 18px; accent-color: var(--iaq-accent); margin: 0; flex: 0 0 auto; }
+.iaq-check small { color: var(--iaq-muted); font-size: 12px; }
+.iaq-sizes { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; }
+.iaq-sz { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; }
+.iaq .iaq-sz input { width: 100%; padding: 9px 6px; text-align: center; border: 1.5px solid var(--iaq-line); border-radius: 10px; font: inherit; font-size: 16px; background: #fff; color: var(--iaq-ink); }
+.iaq .iaq-sz input:focus { outline: none; border-color: var(--iaq-accent); }
+.iaq-total { margin-top: 10px; font-weight: 700; }
+.iaq .iaq-input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--iaq-line); border-radius: 12px; font: inherit; font-size: 15px; background: #fff; color: var(--iaq-ink); }
+.iaq .iaq-input:focus { outline: none; border-color: var(--iaq-accent); }
+.iaq-field { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; margin-top: 12px; }
+.iaq-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 16px; }
+.iaq-error { color: #b42318; font-weight: 600; font-size: 15px; }
+.iaq-error:empty { display: none; }
+.iaq-fine { font-size: 13px; color: var(--iaq-muted); margin: 8px 2px 0; }
+
+/* Review */
+.iaq-review-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.iaq-review-head h3, .iaq-contact h3 { margin: 0; font-size: 24px; }
+.iaq-items { display: grid; gap: 12px; margin-bottom: 28px; }
+.iaq-item { display: flex; gap: 16px; padding: 12px; border: 1.5px solid var(--iaq-line); border-radius: var(--iaq-radius); background: #fff; }
+.iaq-item-canvas { flex: 0 0 auto; width: 120px; height: auto; align-self: flex-start; border-radius: 8px; background: var(--iaq-soft); }
+.iaq-item-body { flex: 1; min-width: 0; font-size: 15px; display: grid; gap: 2px; }
+.iaq-item-title { font-weight: 700; font-size: 16px; }
+.iaq-item-actions { display: flex; gap: 18px; margin-top: 4px; }
+.iaq-contact { padding: 22px; border-radius: var(--iaq-radius); background: var(--iaq-soft); }
+.iaq-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; margin-bottom: 18px; }
+.iaq-wide { grid-column: 1 / -1; }
+.iaq-extras { display: grid; gap: 8px; justify-items: start; margin: 6px 0 10px; }
+.iaq-extra { font-size: 14px; }
+.iaq-hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; }
+
+/* Done */
+.iaq-done { text-align: center; padding: 30px 10px; }
+.iaq-done-icon { display: inline-grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: var(--iaq-accent); color: #fff; font-size: 32px; font-weight: 700; }
+.iaq-done h3 { font-size: 28px; margin: 14px 0 6px; }
+.iaq-done-mocks { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 20px 0 24px; }
+.iaq-done-mocks img { width: 220px; max-width: 45%; height: auto; border-radius: 10px; border: 1.5px solid var(--iaq-line); background: #fff; }
+
+@media (max-width: 860px) {
+	.iaq-product { grid-template-columns: 1fr; gap: 18px; }
+	.iaq-stage { position: static; }
+	.iaq-fields { grid-template-columns: 1fr; }
+	.iaq-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+	.iaq-cartbar { border-radius: 16px; }
+	.iaq .iaq-title { font-size: 22px; }
+}
