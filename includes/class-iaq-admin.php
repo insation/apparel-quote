@@ -12,6 +12,7 @@ class IAQ_Admin {
 		add_action( 'admin_post_iaq_save_settings', array( __CLASS__, 'save_settings' ) );
 		add_action( 'admin_post_iaq_import', array( __CLASS__, 'import' ) );
 		add_action( 'admin_post_iaq_file', array( __CLASS__, 'serve_file' ) );
+		add_action( 'admin_post_iaq_photos', array( __CLASS__, 'photos_action' ) );
 		add_action( 'add_meta_boxes_' . IAQ_Quotes::CPT, array( __CLASS__, 'meta_boxes' ) );
 		add_action( 'save_post_' . IAQ_Quotes::CPT, array( __CLASS__, 'save_status' ) );
 		add_filter( 'manage_' . IAQ_Quotes::CPT . '_posts_columns', array( __CLASS__, 'columns' ) );
@@ -121,6 +122,40 @@ class IAQ_Admin {
 			</form>
 
 			<hr>
+			<h2>Product photos</h2>
+			<?php
+			$ps    = IAQ_Images::state();
+			$usage = IAQ_Images::disk_usage();
+			$status_txt = array(
+				'idle'    => 'Not started',
+				'running' => 'Downloading',
+				'paused'  => 'Paused',
+				'done'    => 'Complete',
+			);
+			$st = isset( $ps['status'], $status_txt[ $ps['status'] ] ) ? $ps['status'] : 'idle';
+			?>
+			<p>All photos are stored on this site in <code>wp-content/uploads/iaq-cache</code> (800, 300 and 150 px copies only).</p>
+			<p><strong><?php echo esc_html( $status_txt[ $st ] ); ?></strong>
+			<?php if ( ! empty( $ps['total'] ) ) : ?>
+				&middot; <?php echo (int) $ps['offset']; ?> of <?php echo (int) IAQ_Catalog::count_styles(); ?> styles checked
+				&middot; <?php echo (int) $ps['done']; ?> photos downloaded, <?php echo (int) $ps['skipped']; ?> already here, <?php echo (int) $ps['errors']; ?> failed
+			<?php endif; ?>
+			<br><?php echo (int) $usage['files']; ?> image files, <?php echo esc_html( size_format( $usage['bytes'], 1 ) ); ?> on disk.
+			<?php if ( 'running' === $st && ! empty( $ps['updated'] ) ) : ?>
+				<br><span class="description">Last activity <?php echo esc_html( human_time_diff( (int) $ps['updated'] ) ); ?> ago. Refresh this page to see progress.</span>
+			<?php endif; ?></p>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+				<?php wp_nonce_field( 'iaq_photos' ); ?>
+				<input type="hidden" name="action" value="iaq_photos">
+				<?php if ( 'running' === $st ) : ?>
+					<button class="button" name="do" value="pause">Pause</button>
+				<?php elseif ( 'paused' === $st ) : ?>
+					<button class="button button-primary" name="do" value="resume">Resume</button>
+				<?php endif; ?>
+				<button class="button" name="do" value="start"><?php echo 'idle' === $st ? 'Download all photos' : 'Check all photos again'; ?></button>
+			</form>
+
+			<hr>
 			<h2>SanMar catalog</h2>
 			<p>
 				<?php if ( ! empty( $meta['styles'] ) ) : ?>
@@ -169,6 +204,23 @@ class IAQ_Admin {
 		update_option( 'iaq_settings', $new );
 		IAQ_Catalog::clear_cache();
 		self::back( 'Settings saved.' );
+	}
+
+	public static function photos_action() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( 'Not allowed.' );
+		}
+		check_admin_referer( 'iaq_photos' );
+		$do = isset( $_POST['do'] ) ? sanitize_key( $_POST['do'] ) : '';
+		if ( 'pause' === $do ) {
+			IAQ_Images::pause();
+			self::back( 'Photo download paused.' );
+		} elseif ( 'resume' === $do ) {
+			IAQ_Images::resume();
+			self::back( 'Photo download resumed.' );
+		}
+		IAQ_Images::start();
+		self::back( 'Photo download started. It runs in the background; refresh to see progress.' );
 	}
 
 	public static function import() {
@@ -230,7 +282,8 @@ class IAQ_Admin {
 		if ( is_wp_error( $res ) ) {
 			self::back( 'Import failed: ' . $res->get_error_message(), true );
 		}
-		self::back( sprintf( 'Catalog imported: %d current styles.', (int) $res ) );
+		IAQ_Images::start();
+		self::back( sprintf( 'Catalog imported: %d current styles. Downloading any new photos in the background.', (int) $res ) );
 	}
 
 	/**
