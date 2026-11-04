@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Apparel Quote & Mockup (SanMar)
  * Description:       Customers pick a SanMar product, colour and size quantities, upload their logo, see a live mockup and send a quote request. No prices are shown. Shortcode: [apparel_quote]
- * Version:           1.0.2
+ * Version:           1.0.3
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Insation Technologies
@@ -13,7 +13,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'IAQ_VERSION', '1.0.2' );
+define( 'IAQ_VERSION', '1.0.3' );
 define( 'IAQ_FILE', __FILE__ );
 define( 'IAQ_DIR', plugin_dir_path( __FILE__ ) );
 define( 'IAQ_URL', plugin_dir_url( __FILE__ ) );
@@ -25,6 +25,7 @@ require_once IAQ_DIR . 'includes/class-iaq-quotes.php';
 require_once IAQ_DIR . 'includes/class-iaq-admin.php';
 require_once IAQ_DIR . 'includes/class-iaq-frontend.php';
 require_once IAQ_DIR . 'includes/class-iaq-updater.php';
+require_once IAQ_DIR . 'includes/class-iaq-images.php';
 
 /**
  * Plugin settings with defaults.
@@ -56,6 +57,7 @@ function iaq_activate() {
 }
 
 register_deactivation_hook( __FILE__, function () {
+	wp_clear_scheduled_hook( 'iaq_prefetch_cron' );
 	flush_rewrite_rules();
 } );
 
@@ -66,6 +68,7 @@ if ( is_admin() ) {
 	IAQ_Admin::init();
 }
 IAQ_Updater::init();
+IAQ_Images::init();
 
 /**
  * Background catalog import from a URL (used by the admin "download link" option and
@@ -99,4 +102,7 @@ function iaq_run_url_import( $url ) {
 			: array( 'state' => 'done', 'styles' => (int) $res, 'time' => current_time( 'mysql' ) ),
 		false
 	);
+	if ( ! is_wp_error( $res ) ) {
+		IAQ_Images::start();
+	}
 }
