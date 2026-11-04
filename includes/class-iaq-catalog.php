@@ -328,6 +328,12 @@ class IAQ_Catalog {
 		return isset( $canon[ $z ] ) ? $canon[ $z ] : 1000;
 	}
 
+	public static function count_styles() {
+		global $wpdb;
+		$table = self::table();
+		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ); // phpcs:ignore
+	}
+
 	public static function clear_cache() {
 		delete_transient( self::INDEX_CACHE );
 		$old = get_option( 'iaq_index_file' );
