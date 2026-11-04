@@ -1,0 +1,4 @@
+# SanMar catalog data is not distributed with the source (SanMar proprietary data).
+data/
+*.zip
+.DS_Store
