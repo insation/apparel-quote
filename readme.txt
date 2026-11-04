@@ -2,7 +2,7 @@
 Contributors: insationtech
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.0.4
+Stable tag: 1.0.5
 License: GPLv2 or later
 
 Customers pick a SanMar product, colour and size quantities, upload their logo, see a live mockup on the real product photo, and send a quote request. No prices are shown.
