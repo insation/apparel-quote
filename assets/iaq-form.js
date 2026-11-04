@@ -366,9 +366,17 @@
 				ctx.save();
 				ctx.strokeStyle = 'rgba(40,41,42,.7)';
 				ctx.lineWidth = 1;
+				ctx.setLineDash([4, 3]);
 				ctx.strokeRect(x, y, lw, lh);
-				ctx.fillStyle = '#EB4926';
-				ctx.fillRect(x + lw - 6, y + lh - 6, 12, 12);
+				ctx.setLineDash([]);
+				var hs = Math.max(10, Math.round(W / 50));
+				[[x, y], [x + lw, y], [x, y + lh], [x + lw, y + lh]].forEach(function (c) {
+					ctx.fillStyle = '#fff';
+					ctx.strokeStyle = '#EB4926';
+					ctx.lineWidth = 2;
+					ctx.fillRect(c[0] - hs / 2, c[1] - hs / 2, hs, hs);
+					ctx.strokeRect(c[0] - hs / 2, c[1] - hs / 2, hs, hs);
+				});
 				ctx.restore();
 			}
 		});
@@ -561,7 +569,7 @@
 			} else if (!act) {
 				stageNote.textContent = 'No logo on the ' + it.view + '. Pick a ' + it.view + ' placement on the right to add one.';
 			} else {
-				stageNote.textContent = 'Drag the logo to move it. Use the slider to resize.';
+				stageNote.textContent = 'Drag the logo to move it. Drag a corner (or pinch / scroll) to resize.';
 			}
 		}
 		function loadView() {
@@ -589,44 +597,131 @@
 			redraw();
 		});
 
-		// Drag to move.
+		// Move: drag the logo. Resize: drag a corner handle, mouse wheel, or pinch with two fingers.
 		var drag = null;
+		var pointers = {};
+		var pinch = null;
 		function pos(e) {
 			var r = canvas.getBoundingClientRect();
-			return { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height };
+			return { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height, rw: r.width, rh: r.height };
 		}
-		function hit(p) {
-			var lg = logoCanvas();
-			if (!lg) { return null; }
-			var found = null;
-			it.placements.forEach(function (k) {
-				var d = placementDef(it.cat, k), t = it.tf[k];
-				if (!d || d.v !== it.view || !t) { return; }
-				var w = t.w, hh = t.w * (lg.height / lg.width) * (canvas.width / canvas.height);
-				if (p.x >= t.cx - w / 2 - 0.02 && p.x <= t.cx + w / 2 + 0.02 && p.y >= t.cy - hh / 2 - 0.02 && p.y <= t.cy + hh / 2 + 0.02) { found = k; }
+		function logoRect(k) {
+			var lg = logoCanvas(), t = it.tf[k];
+			if (!lg || !t) { return null; }
+			var hh = t.w * (lg.height / lg.width) * (canvas.width / canvas.height);
+			return { x0: t.cx - t.w / 2, x1: t.cx + t.w / 2, y0: t.cy - hh / 2, y1: t.cy + hh / 2 };
+		}
+		function visibleKeys() {
+			return it.placements.filter(function (k) {
+				var d = placementDef(it.cat, k);
+				return d && d.v === it.view && it.tf[k];
 			});
-			return found;
+		}
+		// Returns { k, mode: 'move' | 'resize' } for the logo under the pointer.
+		function hit(p) {
+			if (!logoCanvas()) { return null; }
+			var keys = visibleKeys();
+			// Corner handles of the active logo first (generous target for fingers).
+			var tol = 16 / Math.max(1, p.rw);
+			var tolY = 16 / Math.max(1, p.rh);
+			var order = keys.filter(function (k) { return k === it.active; }).concat(keys.filter(function (k) { return k !== it.active; }));
+			for (var i = 0; i < order.length; i++) {
+				var r = logoRect(order[i]);
+				if (!r) { continue; }
+				var corners = [[r.x0, r.y0], [r.x1, r.y0], [r.x0, r.y1], [r.x1, r.y1]];
+				for (var c = 0; c < 4; c++) {
+					if (Math.abs(p.x - corners[c][0]) <= tol && Math.abs(p.y - corners[c][1]) <= tolY) {
+						return { k: order[i], mode: 'resize', corner: c };
+					}
+				}
+			}
+			for (var j = order.length - 1; j >= 0; j--) {
+				var rr = logoRect(order[j]);
+				if (rr && p.x >= rr.x0 - 0.01 && p.x <= rr.x1 + 0.01 && p.y >= rr.y0 - 0.01 && p.y <= rr.y1 + 0.01) {
+					return { k: order[j], mode: 'move' };
+				}
+			}
+			return null;
+		}
+		function clampW(w) { return Math.max(0.03, Math.min(0.9, w)); }
+		function pxDist(p, t) {
+			var dx = (p.x - t.cx) * p.rw, dy = (p.y - t.cy) * p.rh;
+			return Math.sqrt(dx * dx + dy * dy);
 		}
 		canvas.addEventListener('pointerdown', function (e) {
-			var p = pos(e), k = hit(p);
-			if (!k) { return; }
-			it.active = k;
-			drag = { k: k, dx: p.x - it.tf[k].cx, dy: p.y - it.tf[k].cy };
+			var p = pos(e);
+			pointers[e.pointerId] = p;
+			var ids = Object.keys(pointers);
+			if (ids.length === 2) {
+				// Two fingers: pinch-resize the active logo.
+				var k2 = it.active && it.tf[it.active] && visibleKeys().indexOf(it.active) >= 0 ? it.active : visibleKeys()[0];
+				if (k2) {
+					var a = pointers[ids[0]], b = pointers[ids[1]];
+					pinch = { k: k2, d: Math.hypot((a.x - b.x) * a.rw, (a.y - b.y) * a.rh) || 1, w: it.tf[k2].w };
+					drag = null;
+				}
+				canvas.setPointerCapture(e.pointerId);
+				e.preventDefault();
+				return;
+			}
+			var h0 = hit(p);
+			if (!h0) { return; }
+			it.active = h0.k;
+			var t = it.tf[h0.k];
+			if (h0.mode === 'resize') {
+				drag = { k: h0.k, mode: 'resize', d0: pxDist(p, t) || 1, w0: t.w };
+			} else {
+				drag = { k: h0.k, mode: 'move', dx: p.x - t.cx, dy: p.y - t.cy };
+			}
 			canvas.setPointerCapture(e.pointerId);
 			e.preventDefault();
 			redraw();
 		});
 		canvas.addEventListener('pointermove', function (e) {
 			var p = pos(e);
-			if (!drag) { canvas.style.cursor = hit(p) ? 'move' : 'default'; return; }
+			if (pointers[e.pointerId]) { pointers[e.pointerId] = p; }
+			if (pinch) {
+				var ids = Object.keys(pointers);
+				if (ids.length >= 2) {
+					var a = pointers[ids[0]], b = pointers[ids[1]];
+					var d = Math.hypot((a.x - b.x) * a.rw, (a.y - b.y) * a.rh);
+					it.tf[pinch.k].w = clampW(pinch.w * d / pinch.d);
+					redraw();
+				}
+				return;
+			}
+			if (!drag) {
+				var hv = hit(p);
+				if (!hv) { canvas.style.cursor = 'default'; }
+				else if (hv.mode === 'move') { canvas.style.cursor = 'move'; }
+				else { canvas.style.cursor = (hv.corner === 0 || hv.corner === 3) ? 'nwse-resize' : 'nesw-resize'; }
+				return;
+			}
 			var t = it.tf[drag.k];
-			t.cx = Math.max(0.03, Math.min(0.97, p.x - drag.dx));
-			t.cy = Math.max(0.03, Math.min(0.97, p.y - drag.dy));
+			if (drag.mode === 'resize') {
+				t.w = clampW(drag.w0 * pxDist(p, t) / drag.d0);
+			} else {
+				t.cx = Math.max(0.03, Math.min(0.97, p.x - drag.dx));
+				t.cy = Math.max(0.03, Math.min(0.97, p.y - drag.dy));
+			}
 			redraw();
 		});
-		function endDrag() { drag = null; }
+		function endDrag(e) {
+			delete pointers[e.pointerId];
+			if (Object.keys(pointers).length < 2) { pinch = null; }
+			drag = null;
+		}
 		canvas.addEventListener('pointerup', endDrag);
 		canvas.addEventListener('pointercancel', endDrag);
+		canvas.addEventListener('wheel', function (e) {
+			var p = pos(e), hv = hit(p);
+			if (!hv) { return; }
+			e.preventDefault();
+			it.active = hv.k;
+			var t = it.tf[hv.k];
+			t.w = clampW(t.w * (e.deltaY < 0 ? 1.06 : 1 / 1.06));
+			redraw();
+		}, { passive: false });
 
 		var viewBtns = h('div', { class: 'iaq-seg' });
 		function paintViews() {
