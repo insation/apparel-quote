@@ -125,7 +125,6 @@
 	function defaultPlacement(cat) { return placementsFor(cat)[0].k; }
 
 	var METHODS = [
-		{ v: 'screen', t: 'Screen printing' },
 		{ v: 'embroidery', t: 'Embroidery' },
 		{ v: 'dtf', t: 'DTF / heat transfer' },
 		{ v: 'unsure', t: 'Not sure - recommend for me' }
@@ -803,7 +802,7 @@
 		var colorsWrap = h('div');
 		function paintColors() {
 			clear(colorsWrap);
-			if (it.method !== 'screen' && it.method !== 'unsure') { return; }
+			return; // Colour-count question was only needed for screen printing (not offered).
 			var sel = h('select', { class: 'iaq-input', onchange: function (e) { it.logo_colors = e.target.value; } },
 				['', '1', '2', '3', '4', '5+', 'Full colour / photo', 'Not sure'].map(function (o) {
 					return h('option', { value: o, selected: it.logo_colors === o }, o || 'Choose…');
