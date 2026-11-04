@@ -602,12 +602,15 @@
 				stageNote.textContent = 'Drag the logo to move it. Drag a corner (or pinch / scroll) to resize.';
 			}
 		}
+		var loadSeq = 0;
 		function loadView() {
 			var p = viewPath(it, it.view);
+			var req = ++loadSeq; // Ignore photos that arrive after the customer switched colour or side.
 			photo = null;
 			if (!p) { redraw(); return; }
 			canvas.classList.add('is-loading');
 			loadImage(proxyUrl(p, 800)).then(function (im) {
+				if (req !== loadSeq) { return; }
 				photo = im;
 				var W = 600, H = Math.round(W * im.naturalHeight / im.naturalWidth);
 				canvas.width = W; canvas.height = H;
@@ -615,8 +618,9 @@
 				redraw();
 			}).catch(function () {
 				// Fall back to the direct image (shown, but cannot be exported).
-				loadImage(imgUrl(p)).then(function (im) { photo = im; canvas.classList.remove('is-loading'); redraw(); })
-					.catch(function () { canvas.classList.remove('is-loading'); redraw(); });
+				if (req !== loadSeq) { return; }
+				loadImage(imgUrl(p)).then(function (im) { if (req !== loadSeq) { return; } photo = im; canvas.classList.remove('is-loading'); redraw(); })
+					.catch(function () { if (req !== loadSeq) { return; } canvas.classList.remove('is-loading'); redraw(); });
 			});
 		}
 
