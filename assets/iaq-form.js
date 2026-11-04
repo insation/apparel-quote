@@ -263,7 +263,7 @@
 			var x = c.getContext('2d'); x.drawImage(img, 0, 0, W, H);
 			var d = x.getImageData(0, 0, W, H).data;
 			var bg = [d[0], d[1], d[2]];
-			var isFg = function (i) { return Math.abs(d[i] - bg[0]) + Math.abs(d[i + 1] - bg[1]) + Math.abs(d[i + 2] - bg[2]) > 36; };
+			var isFg = function (i) { return Math.abs(d[i] - bg[0]) + Math.abs(d[i + 1] - bg[1]) + Math.abs(d[i + 2] - bg[2]) > 12; };
 			var rows = [];
 			for (var yy = 0; yy < H; yy++) {
 				var l = -1, r = -1;
@@ -341,19 +341,29 @@
 			var def = placementDef(item.cat, k);
 			if (!def || def.v !== view) { return; }
 			var box = boxFor(def, photo, item);
-			var lgx = logoCanvas();
-			if (lgx && photo && !item.tf[k]) { item.tf[k] = defaultTransform(def, W / H, box); }
+			if (photo && !item.tf[k]) {
+				item.tf[k] = lg ? defaultTransform(def, W / H, box)
+					// No logo yet: an adjustable print area the logo will be fitted into later.
+					: { cx: box[0] + box[2] / 2, cy: box[1] + box[3] / 2, w: box[2], h: box[3], a: W / H, area: true };
+			}
 			var t = item.tf[k];
 			var active = opts.active === k;
-			if (opts.guides && active) {
+			if (!t) { return; }
+			if (!lg || t.area) {
+				if (!opts.guides) { return; }
+				var ax = (t.cx - t.w / 2) * W, ay = (t.cy - t.h / 2) * H, aw = t.w * W, ah = t.h * H;
 				ctx.save();
+				ctx.fillStyle = 'rgba(235,73,38,.06)';
+				ctx.fillRect(ax, ay, aw, ah);
 				ctx.setLineDash([6, 5]);
-				ctx.strokeStyle = 'rgba(235,73,38,.85)';
+				ctx.strokeStyle = 'rgba(235,73,38,.9)';
 				ctx.lineWidth = 1.5;
-				ctx.strokeRect(box[0] * W, box[1] * H, box[2] * W, box[3] * H);
+				ctx.strokeRect(ax, ay, aw, ah);
+				ctx.setLineDash([]);
+				if (active) { drawHandles(ctx, W, ax, ay, aw, ah); }
 				ctx.restore();
+				return;
 			}
-			if (!lg || !t) { return; }
 			var lw = t.w * W;
 			var lh = lw * lg.height / lg.width;
 			var x = t.cx * W - lw / 2, y = t.cy * H - lh / 2;
@@ -368,16 +378,37 @@
 				ctx.setLineDash([4, 3]);
 				ctx.strokeRect(x, y, lw, lh);
 				ctx.setLineDash([]);
-				var hs = Math.max(10, Math.round(W / 50));
-				[[x, y], [x + lw, y], [x, y + lh], [x + lw, y + lh]].forEach(function (c) {
-					ctx.fillStyle = '#fff';
-					ctx.strokeStyle = '#EB4926';
-					ctx.lineWidth = 2;
-					ctx.fillRect(c[0] - hs / 2, c[1] - hs / 2, hs, hs);
-					ctx.strokeRect(c[0] - hs / 2, c[1] - hs / 2, hs, hs);
-				});
+				drawHandles(ctx, W, x, y, lw, lh);
 				ctx.restore();
 			}
+		});
+	}
+
+	function drawHandles(ctx, W, x, y, w, h) {
+		var hs = Math.max(10, Math.round(W / 50));
+		[[x, y], [x + w, y], [x, y + h], [x + w, y + h]].forEach(function (c) {
+			ctx.fillStyle = '#fff';
+			ctx.strokeStyle = '#EB4926';
+			ctx.lineWidth = 2;
+			ctx.fillRect(c[0] - hs / 2, c[1] - hs / 2, hs, hs);
+			ctx.strokeRect(c[0] - hs / 2, c[1] - hs / 2, hs, hs);
+		});
+	}
+
+	/**
+	 * Turn print areas chosen before the logo was uploaded into logo positions:
+	 * the logo is fitted inside the area, at its top, centred across.
+	 */
+	function fitLogoToAreas(item) {
+		var lg = logoCanvas();
+		item.tf = item.tf || {};
+		Object.keys(item.tf).forEach(function (k) {
+			var t = item.tf[k];
+			if (!t || !t.area || !lg) { return; }
+			var a = t.a || 1;
+			var w = Math.min(t.w, t.h * (lg.width / lg.height) / a);
+			var lh = w * a * lg.height / lg.width;
+			item.tf[k] = { cx: t.cx, cy: t.cy - t.h / 2 + lh / 2, w: w };
 		});
 	}
 
@@ -559,12 +590,12 @@
 			var act = activeOnView();
 			drawMock(ctx, canvas.width, canvas.height, photo, it, it.view, { guides: true, active: act });
 			var lg = logoCanvas();
-			sizeRow.style.display = lg && act ? '' : 'none';
+			sizeRow.style.display = act && it.tf[act] ? '' : 'none';
 			if (act && it.tf[act]) { sizeRange.value = Math.round(it.tf[act].w * 100); }
 			if (!lg) {
 				stageNote.textContent = S.logo && !S.logo.previewable
 					? 'We can\'t preview ' + extOf(S.logo.name).toUpperCase() + ' files here. Add a PNG or JPG version below to see the mockup. Your original file will still be sent.'
-					: 'Upload your logo below to see it on this product.';
+					: 'Drag the dashed box to where you want your logo, and drag a corner to resize it. Upload your logo below to see it.';
 			} else if (!act) {
 				stageNote.textContent = 'No logo on the ' + it.view + '. Pick a ' + it.view + ' placement on the right to add one.';
 			} else {
@@ -592,7 +623,7 @@
 		sizeRange.addEventListener('input', function () {
 			var act = activeOnView();
 			if (!act) { return; }
-			it.tf[act].w = (+sizeRange.value) / 100;
+			setW(it.tf[act], (+sizeRange.value) / 100);
 			redraw();
 		});
 
@@ -606,8 +637,8 @@
 		}
 		function logoRect(k) {
 			var lg = logoCanvas(), t = it.tf[k];
-			if (!lg || !t) { return null; }
-			var hh = t.w * (lg.height / lg.width) * (canvas.width / canvas.height);
+			if (!t) { return null; }
+			var hh = (!lg || t.area) ? t.h : t.w * (lg.height / lg.width) * (canvas.width / canvas.height);
 			return { x0: t.cx - t.w / 2, x1: t.cx + t.w / 2, y0: t.cy - hh / 2, y1: t.cy + hh / 2 };
 		}
 		function visibleKeys() {
@@ -618,7 +649,6 @@
 		}
 		// Returns { k, mode: 'move' | 'resize' } for the logo under the pointer.
 		function hit(p) {
-			if (!logoCanvas()) { return null; }
 			var keys = visibleKeys();
 			// Corner handles of the active logo first (generous target for fingers).
 			var tol = 16 / Math.max(1, p.rw);
@@ -643,6 +673,12 @@
 			return null;
 		}
 		function clampW(w) { return Math.max(0.03, Math.min(0.9, w)); }
+		// Set the width; print areas (no logo yet) keep their proportions.
+		function setW(t, w) {
+			var nw = clampW(w);
+			if (t.area && t.w) { t.h = Math.max(0.02, Math.min(0.95, t.h * nw / t.w)); }
+			t.w = nw;
+		}
 		function pxDist(p, t) {
 			var dx = (p.x - t.cx) * p.rw, dy = (p.y - t.cy) * p.rh;
 			return Math.sqrt(dx * dx + dy * dy);
@@ -684,7 +720,7 @@
 				if (ids.length >= 2) {
 					var a = pointers[ids[0]], b = pointers[ids[1]];
 					var d = Math.hypot((a.x - b.x) * a.rw, (a.y - b.y) * a.rh);
-					it.tf[pinch.k].w = clampW(pinch.w * d / pinch.d);
+					setW(it.tf[pinch.k], pinch.w * d / pinch.d);
 					redraw();
 				}
 				return;
@@ -698,7 +734,7 @@
 			}
 			var t = it.tf[drag.k];
 			if (drag.mode === 'resize') {
-				t.w = clampW(drag.w0 * pxDist(p, t) / drag.d0);
+				setW(t, drag.w0 * pxDist(p, t) / drag.d0);
 			} else {
 				t.cx = Math.max(0.03, Math.min(0.97, p.x - drag.dx));
 				t.cy = Math.max(0.03, Math.min(0.97, p.y - drag.dy));
@@ -718,7 +754,7 @@
 			e.preventDefault();
 			it.active = hv.k;
 			var t = it.tf[hv.k];
-			t.w = clampW(t.w * (e.deltaY < 0 ? 1.06 : 1 / 1.06));
+			setW(t, t.w * (e.deltaY < 0 ? 1.06 : 1 / 1.06));
 			redraw();
 		}, { passive: false });
 
@@ -770,8 +806,9 @@
 			}
 		}
 		function resetTransforms() {
-			S.items.forEach(function (x) { x.tf = {}; ensureTransforms(x); });
-			it.tf = {}; ensureTransforms(it);
+			// Keep where the customer put things: fit the logo into each print area.
+			S.items.forEach(function (x) { ensureTransforms(x); fitLogoToAreas(x); });
+			ensureTransforms(it); fitLogoToAreas(it);
 		}
 		paintLogo();
 
