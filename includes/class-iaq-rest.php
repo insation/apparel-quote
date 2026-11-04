@@ -107,12 +107,14 @@ class IAQ_REST {
 	 */
 	public static function image( WP_REST_Request $req ) {
 		$p = (string) $req['p'];
-		if ( ! preg_match( '#^([0-9]{4}/f[0-9]{1,3}/)?[A-Za-z0-9_\-\.]+\.jpe?g$#i', $p ) || false !== strpos( $p, '..' ) ) {
+		if ( ! IAQ_Images::valid_path( $p ) ) {
 			return new WP_Error( 'iaq_bad_path', 'Invalid image path.', array( 'status' => 400 ) );
 		}
-		$up   = wp_upload_dir();
-		$dir  = trailingslashit( $up['basedir'] ) . 'iaq-cache';
-		$file = $dir . '/' . md5( $p ) . '.jpg';
+		$w = (int) $req['w'];
+		if ( ! in_array( $w, IAQ_Images::SIZES, true ) ) {
+			$w = 800; // Largest size kept (also used for the emailed mockups).
+		}
+		$file = IAQ_Images::file_for( $p, $w );
 
 		if ( ! file_exists( $file ) ) {
 			// Only fetch images that belong to a product in the catalog.
@@ -122,47 +124,9 @@ class IAQ_REST {
 			if ( ! $known ) {
 				return new WP_Error( 'iaq_unknown_img', 'Unknown image.', array( 'status' => 404 ) );
 			}
-			wp_mkdir_p( $dir );
-			$resp = wp_remote_get(
-				IAQ_IMG_BASE . $p,
-				array(
-					'timeout'     => 20,
-					'redirection' => 2,
-				)
-			);
-			if ( is_wp_error( $resp ) || 200 !== (int) wp_remote_retrieve_response_code( $resp ) ) {
+			$r = IAQ_Images::ensure( $p );
+			if ( is_wp_error( $r ) || ! file_exists( $file ) ) {
 				return new WP_Error( 'iaq_img_fetch', 'Image not available.', array( 'status' => 502 ) );
-			}
-			$body = wp_remote_retrieve_body( $resp );
-			$type = wp_remote_retrieve_header( $resp, 'content-type' );
-			if ( ! $body || ( $type && 0 !== strpos( $type, 'image/' ) ) ) {
-				return new WP_Error( 'iaq_img_type', 'Not an image.', array( 'status' => 502 ) );
-			}
-			file_put_contents( $file, $body ); // phpcs:ignore WordPress.WP.AlternativeFunctions
-		}
-
-		// Optional smaller copy (thumbnails, on-screen preview). Cached next to the original.
-		$w = (int) $req['w'];
-		if ( in_array( $w, array( 150, 300, 800 ), true ) ) {
-			$small = $dir . '/' . md5( $p ) . '-' . $w . '.jpg';
-			if ( ! file_exists( $small ) ) {
-				$ed = wp_get_image_editor( $file );
-				if ( ! is_wp_error( $ed ) ) {
-					$ed->set_quality( 82 );
-					$size = $ed->get_size();
-					if ( $size['width'] > $w ) {
-						$ed->resize( $w, null, false );
-					}
-					$saved = $ed->save( $small, 'image/jpeg' );
-					if ( is_wp_error( $saved ) ) {
-						$small = '';
-					}
-				} else {
-					$small = '';
-				}
-			}
-			if ( $small && file_exists( $small ) ) {
-				$file = $small;
 			}
 		}
 
