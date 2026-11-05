@@ -1,12 +1,12 @@
 <?php
 /**
- * Shortcode [apparel_catalog]: browsable product catalogue (server-rendered).
+ * Shortcode [apparel_catalog]: browsable product catalog (server-rendered).
  *
  *   No category      -> category tiles
  *   ?cat=t-shirts    -> products in that category (search, brand filter, pages)
  *
  * Each product links to the quote form page with ?style=STYLE so the customer
- * lands straight on that product to pick colour, sizes and logo.
+ * lands straight on that product to pick color, sizes and logo.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -137,7 +137,7 @@ class IAQ_Catalog_Page {
 			}
 		}
 		$base = remove_query_arg( array( 'cat', 'q', 'brand', 'pg' ) );
-		echo '<p class="iaq-intro">Browse our apparel catalogue. Pick a product to choose your colour and sizes, add your logo and see it on the product, then send it to us for a quote.</p>';
+		echo '<p class="iaq-intro">Browse our apparel catalog. Pick a product to choose your color and sizes, add your logo and see it on the product, then send it to us for a quote.</p>';
 		self::search_form( '', '' );
 		echo '<div class="iaq-grid iaq-cat-grid">';
 		foreach ( $cats as $c ) {
@@ -179,7 +179,7 @@ class IAQ_Catalog_Page {
 		sort( $brands );
 		$list = $brand ? array_values( array_filter( $in_cat, function ( $s ) use ( $brand ) { return $s['b'] === $brand; } ) ) : $in_cat;
 
-		// Popular brands first (stable: keeps the catalogue order inside each brand).
+		// Popular brands first (stable: keeps the catalog order inside each brand).
 		$pos = 0;
 		foreach ( $list as &$row ) {
 			$row['_o'] = $pos++;
@@ -245,7 +245,7 @@ class IAQ_Catalog_Page {
 			}
 			echo '<span class="iaq-card-brand">' . esc_html( $s['b'] . ' · ' . $s['s'] ) . '</span>';
 			echo '<span class="iaq-card-title">' . esc_html( $s['t'] ) . '</span>';
-			echo '<span class="iaq-card-meta">' . (int) $s['k'] . ( 1 === (int) $s['k'] ? ' colour' : ' colours' ) . '</span>';
+			echo '<span class="iaq-card-meta">' . (int) $s['k'] . ( 1 === (int) $s['k'] ? ' color' : ' colors' ) . '</span>';
 			echo '<span class="iaq-btn iaq-btn-primary iaq-btn-sm iaq-card-cta">Customize</span>';
 			echo '</a>';
 		}
