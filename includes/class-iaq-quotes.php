@@ -80,8 +80,59 @@ class IAQ_Quotes {
 
 	/**
 	 * POST /iaq/v1/submit
+	 *
+	 * Wraps the real handler so every failure (and every crash) is logged with
+	 * its reason, and the customer gets a clear message plus a short error ID.
 	 */
 	public static function handle_submit( WP_REST_Request $req ) {
+		$p   = $req->get_body_params();
+		$ctx = array(
+			'name'  => isset( $p['name'] ) ? $p['name'] : '',
+			'email' => isset( $p['email'] ) ? $p['email'] : '',
+			'ip'    => substr( self::client_ip_hash(), 0, 10 ),
+			'agent' => isset( $_SERVER['HTTP_USER_AGENT'] ) ? substr( sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ), 0, 120 ) : '',
+		);
+
+		// Upload bigger than the server accepts: PHP silently drops the whole form.
+		$len = isset( $_SERVER['CONTENT_LENGTH'] ) ? (int) $_SERVER['CONTENT_LENGTH'] : 0;
+		$max = wp_convert_hr_to_bytes( ini_get( 'post_max_size' ) );
+		if ( $len && $max && $len > $max ) {
+			$msg = sprintf( 'Your files are too large to send together (%.1f MB; the limit is %d MB). Please use smaller files or send fewer at once.', $len / MB_IN_BYTES, (int) ( $max / MB_IN_BYTES ) );
+			$id  = IAQ_Log::add( 'upload', $msg, 413, $ctx );
+			return new WP_Error( 'iaq_too_large', $msg, array( 'status' => 413, 'error_id' => $id ) );
+		}
+
+		try {
+			$res = self::process_submit( $req );
+		} catch ( \Throwable $e ) {
+			$ctx['detail'] = $e->getMessage() . ' in ' . basename( $e->getFile() ) . ':' . $e->getLine();
+			$id            = IAQ_Log::add( 'crash', 'The website hit an error while saving the request.', 500, $ctx );
+			return new WP_Error( 'iaq_crash', 'Sorry, the website hit an error while sending your request. Please call us and mention error ID ' . $id . '.', array( 'status' => 500, 'error_id' => $id ) );
+		}
+
+		if ( is_wp_error( $res ) ) {
+			$data   = (array) $res->get_error_data();
+			$status = isset( $data['status'] ) ? (int) $data['status'] : 400;
+			$msg    = $res->get_error_message();
+			$type   = 'validation';
+			if ( 403 === $status ) {
+				$type = 'session';
+			} elseif ( 429 === $status ) {
+				$type = 'limit';
+			} elseif ( $status >= 500 ) {
+				$type = 'server';
+			} elseif ( preg_match( '/upload|too large|file type|valid image|PDF/i', $msg ) ) {
+				$type = 'upload';
+			}
+			$id               = IAQ_Log::add( $type, $msg, $status, $ctx );
+			$data['error_id'] = $id;
+			$res->add_data( $data );
+			return $res;
+		}
+		return $res;
+	}
+
+	private static function process_submit( WP_REST_Request $req ) {
 		$p = $req->get_body_params();
 
 		// Spam checks.
@@ -378,6 +429,7 @@ class IAQ_Quotes {
 		$files = (array) get_post_meta( $post_id, '_iaq_files', true );
 		$ref   = self::reference( $post_id );
 		$site  = wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES );
+		$mail  = array();
 
 		$all_attach  = array();
 		$mock_attach = array();
@@ -405,7 +457,9 @@ class IAQ_Quotes {
 			$body .= '<p style="font:13px/1.5 Arial,sans-serif;color:#666">The logo and mockups are attached. Reply to this email to answer the customer directly.<br>';
 			$body .= '<a href="' . esc_url( admin_url( 'post.php?post=' . (int) $post_id . '&action=edit' ) ) . '">Open this request in WordPress</a></p>';
 			$subject = sprintf( 'Quote request %s - %s%s', $ref, $c['name'], $c['company'] ? ' (' . $c['company'] . ')' : '' );
-			wp_mail( $to, self::header_safe( $subject ), self::wrap( $body ), $h, $all_attach );
+			$mail['shop'] = self::mail_tracked( $to, self::header_safe( $subject ), self::wrap( $body ), $h, $all_attach );
+		} else {
+			$mail['shop'] = 'No valid notification email is set in Quote Requests > Settings.';
 		}
 
 		// Copy to the customer.
@@ -416,8 +470,41 @@ class IAQ_Quotes {
 			$body .= $summary;
 			$body .= '<p style="font:15px/1.5 Arial,sans-serif">' . esc_html( $site ) . '</p>';
 			$subject = sprintf( 'Your quote request %s - %s', $ref, $site );
-			wp_mail( $c['email'], self::header_safe( $subject ), self::wrap( $body ), $headers, $mock_attach );
+			$mail['customer'] = self::mail_tracked( $c['email'], self::header_safe( $subject ), self::wrap( $body ), $headers, $mock_attach );
 		}
+
+		update_post_meta( $post_id, '_iaq_mail', $mail );
+		foreach ( $mail as $who => $result ) {
+			if ( true !== $result ) {
+				IAQ_Log::add(
+					'mail',
+					'shop' === $who ? 'The quote email to the shop could not be sent.' : 'The copy to the customer could not be sent.',
+					0,
+					array( 'name' => $c['name'], 'email' => $c['email'], 'detail' => $result, 'quote' => $ref )
+				);
+			}
+		}
+	}
+
+	/**
+	 * wp_mail() that returns true, or the reason it failed.
+	 */
+	private static function mail_tracked( $to, $subject, $body, $headers, $attach ) {
+		$reason = '';
+		$catch  = function ( $err ) use ( &$reason ) {
+			if ( is_wp_error( $err ) ) {
+				$reason = $err->get_error_message();
+			}
+		};
+		add_action( 'wp_mail_failed', $catch );
+		try {
+			$ok = wp_mail( $to, $subject, $body, $headers, $attach );
+		} catch ( \Throwable $e ) {
+			$ok     = false;
+			$reason = $e->getMessage();
+		}
+		remove_action( 'wp_mail_failed', $catch );
+		return $ok ? true : ( $reason ? $reason : 'The mail server rejected the message (no reason given).' );
 	}
 
 	private static function header_safe( $s ) {
