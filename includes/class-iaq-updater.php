@@ -133,7 +133,7 @@ class IAQ_Updater {
 			'download_link' => $rel ? $rel['package'] : '',
 			'last_updated'  => $rel ? $rel['published'] : '',
 			'sections'      => array(
-				'description' => 'Customers pick a SanMar product, colour and sizes, upload their logo, see a live mockup and send a quote request.',
+				'description' => 'Customers pick a SanMar product, color and sizes, upload their logo, see a live mockup and send a quote request.',
 				'changelog'   => $rel && $rel['notes'] ? wpautop( esc_html( $rel['notes'] ) ) : 'See GitHub releases.',
 			),
 		);
