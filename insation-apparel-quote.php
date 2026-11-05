@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name:       Apparel Quote & Mockup (SanMar)
- * Description:       Customers pick a SanMar product, colour and size quantities, upload their logo, see a live mockup and send a quote request. No prices are shown. Shortcode: [apparel_quote]
- * Version:           1.0.6
+ * Description:       Customers pick a SanMar product, colour and size quantities, upload their logo, see a live mockup and send a quote request. No prices are shown. Shortcodes: [apparel_quote] (form), [apparel_catalog] (catalogue)
+ * Version:           1.0.7
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Insation Technologies
@@ -13,7 +13,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'IAQ_VERSION', '1.0.6' );
+define( 'IAQ_VERSION', '1.0.7' );
 define( 'IAQ_FILE', __FILE__ );
 define( 'IAQ_DIR', plugin_dir_path( __FILE__ ) );
 define( 'IAQ_URL', plugin_dir_url( __FILE__ ) );
@@ -26,6 +26,7 @@ require_once IAQ_DIR . 'includes/class-iaq-admin.php';
 require_once IAQ_DIR . 'includes/class-iaq-frontend.php';
 require_once IAQ_DIR . 'includes/class-iaq-updater.php';
 require_once IAQ_DIR . 'includes/class-iaq-images.php';
+require_once IAQ_DIR . 'includes/class-iaq-catalog-page.php';
 
 /**
  * Plugin settings with defaults.
@@ -69,6 +70,7 @@ if ( is_admin() ) {
 }
 IAQ_Updater::init();
 IAQ_Images::init();
+IAQ_Catalog_Page::init();
 
 /**
  * Background catalog import from a URL (used by the admin "download link" option and
