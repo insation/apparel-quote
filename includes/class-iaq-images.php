@@ -5,7 +5,7 @@
  * Only resized copies are kept (800, 300 and 150 px wide). The full-size SanMar
  * original is downloaded to a temp file, resized, and deleted.
  *
- * A background job downloads the whole catalogue in batches. Each batch runs for
+ * A background job downloads the whole catalog in batches. Each batch runs for
  * a limited time, then starts the next batch with a non-blocking request to
  * itself. WP-Cron runs it again every 5 minutes as a fallback in case the chain
  * breaks.
@@ -137,7 +137,7 @@ class IAQ_Images {
 	}
 
 	/**
-	 * Start (or restart) downloading the whole catalogue.
+	 * Start (or restart) downloading the whole catalog.
 	 */
 	public static function start() {
 		global $wpdb;
@@ -264,7 +264,7 @@ class IAQ_Images {
 			$d       = json_decode( $row['data'], true );
 			$partial = false;
 			foreach ( (array) $d['col'] as $c ) {
-				// Styles with many colours: stop mid-style and finish it in the next batch
+				// Styles with many colors: stop mid-style and finish it in the next batch
 				// (photos already saved are skipped then).
 				if ( microtime( true ) - $start > self::TIME_LIMIT ) {
 					$partial = true;
