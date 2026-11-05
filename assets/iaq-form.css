@@ -112,7 +112,7 @@
 .iaq-desc summary { cursor: pointer; font-weight: 600; color: var(--iaq-ink); }
 .iaq-group { padding: 16px 0; border-top: 1px solid var(--iaq-line); }
 .iaq-label { font-weight: 700; margin-bottom: 10px; }
-.iaq-colour-name { font-weight: 500; color: var(--iaq-muted); }
+.iaq-color-name { font-weight: 500; color: var(--iaq-muted); }
 .iaq-swatches { display: flex; flex-wrap: wrap; gap: 8px; max-height: 236px; overflow-y: auto; padding: 2px; }
 .iaq .iaq-sw { width: 52px; height: 52px; padding: 2px; border: 2px solid var(--iaq-line); border-radius: 10px; background: #fff; cursor: pointer; }
 .iaq .iaq-sw:hover { border-color: var(--iaq-ink); background: #fff; }
@@ -167,7 +167,7 @@
 	.iaq .iaq-title { font-size: 22px; }
 }
 
-/* Catalogue page */
+/* Catalog page */
 .iaq a.iaq-card, .iaq a.iaq-pill { text-decoration: none; }
 .iaq a.iaq-card:hover .iaq-card-cta { background: var(--iaq-accent-dark); border-color: var(--iaq-accent-dark); }
 .iaq .iaq-card-cta { margin-top: 8px; align-self: flex-start; pointer-events: none; }
