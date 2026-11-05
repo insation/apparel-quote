@@ -35,10 +35,23 @@
 	}
 	function clear(el) { while (el.firstChild) { el.removeChild(el.firstChild); } return el; }
 	function api(path, opts) {
-		return fetch(CFG.rest + path, Object.assign({ credentials: 'same-origin' }, opts || {})).then(function (r) {
-			return r.json().catch(function () { return {}; }).then(function (j) {
-				if (!r.ok) { throw new Error((j && j.message) || ('Request failed (' + r.status + ')')); }
-				return j;
+		return fetch(CFG.rest + path, Object.assign({ credentials: 'same-origin' }, opts || {})).catch(function () {
+			throw new Error('Could not reach the website. Please check your internet connection and try again.');
+		}).then(function (r) {
+			return r.json().catch(function () { return null; }).then(function (j) {
+				if (!r.ok) {
+					var msg = j && j.message;
+					var id = j && j.data && j.data.error_id;
+					if (!msg) {
+						if (r.status === 413) { msg = 'Your files are too large to send. Please use smaller files.'; }
+						else if (r.status === 403) { msg = 'The request was blocked by the website (403). Please reload the page and try again.'; }
+						else if (r.status >= 500) { msg = 'The website had a problem (error ' + r.status + '). Please try again in a minute.'; }
+						else { msg = 'The request failed (error ' + r.status + ').'; }
+					}
+					if (id && msg.indexOf(id) === -1) { msg += ' (Error ID: ' + id + ')'; }
+					throw new Error(msg);
+				}
+				return j || {};
 			});
 		});
 	}
@@ -1134,7 +1147,7 @@
 		}).catch(function (e) {
 			btn.disabled = false;
 			btn.textContent = 'Send my request';
-			errEl.textContent = (e && e.message) || 'Something went wrong. Please try again or call us.';
+			errEl.textContent = ((e && e.message) || 'Something went wrong.') + ' If it keeps happening, please call us and we will take your order by phone.';
 		});
 	}
 
