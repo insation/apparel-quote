@@ -134,7 +134,7 @@
 	/* State                                                               */
 	/* ------------------------------------------------------------------ */
 
-	// Links from the catalogue page: ?style=PC54 opens that product, ?cat=T-Shirts opens a category.
+	// Links from the catalog page: ?style=PC54 opens that product, ?cat=T-Shirts opens a category.
 	try {
 		var qs = new URLSearchParams(window.location.search);
 		if (!CFG.startStyle && qs.get('style')) { CFG.startStyle = qs.get('style'); }
@@ -505,7 +505,7 @@
 				s.n ? h('span', { class: 'iaq-badge' }, 'New') : null,
 				h('span', { class: 'iaq-card-brand' }, s.b + ' · ' + s.s),
 				h('span', { class: 'iaq-card-title' }, s.t),
-				h('span', { class: 'iaq-card-meta' }, s.k + (s.k === 1 ? ' colour' : ' colours'))
+				h('span', { class: 'iaq-card-meta' }, s.k + (s.k === 1 ? ' color' : ' colors'))
 				));
 			});
 			gridWrap.appendChild(grid);
@@ -535,7 +535,7 @@
 		add(root, [
 			CFG.intro ? h('p', { class: 'iaq-intro' }, CFG.intro) : null,
 			cartBar(),
-			h('div', { class: 'iaq-steps' }, step(1, 'Choose a product', true), step(2, 'Colour, sizes & logo'), step(3, 'Send request')),
+			h('div', { class: 'iaq-steps' }, step(1, 'Choose a product', true), step(2, 'Color, sizes & logo'), step(3, 'Send request')),
 			search, pills, countEl, gridWrap
 		]);
 		paint();
@@ -613,7 +613,7 @@
 		var loadSeq = 0;
 		function loadView() {
 			var p = viewPath(it, it.view);
-			var req = ++loadSeq; // Ignore photos that arrive after the customer switched colour or side.
+			var req = ++loadSeq; // Ignore photos that arrive after the customer switched color or side.
 			photo = null;
 			if (!p) { redraw(); return; }
 			canvas.classList.add('is-loading');
@@ -825,7 +825,7 @@
 		paintLogo();
 
 		/* Right column: options */
-		var colorName = h('span', { class: 'iaq-colour-name' }, it.color);
+		var colorName = h('span', { class: 'iaq-color-name' }, it.color);
 		var swatches = h('div', { class: 'iaq-swatches' });
 		st.col.forEach(function (c) {
 			swatches.appendChild(h('button', {
@@ -851,12 +851,12 @@
 		var colorsWrap = h('div');
 		function paintColors() {
 			clear(colorsWrap);
-			return; // Colour-count question was only needed for screen printing (not offered).
+			return; // Color-count question was only needed for screen printing (not offered).
 			var sel = h('select', { class: 'iaq-input', onchange: function (e) { it.logo_colors = e.target.value; } },
-				['', '1', '2', '3', '4', '5+', 'Full colour / photo', 'Not sure'].map(function (o) {
+				['', '1', '2', '3', '4', '5+', 'Full color / photo', 'Not sure'].map(function (o) {
 					return h('option', { value: o, selected: it.logo_colors === o }, o || 'Choose…');
 				}));
-			add(colorsWrap, h('label', { class: 'iaq-field' }, h('span', null, 'How many colours are in your logo?'), sel));
+			add(colorsWrap, h('label', { class: 'iaq-field' }, h('span', null, 'How many colors are in your logo?'), sel));
 		}
 		paintColors();
 
@@ -906,7 +906,7 @@
 		}
 		paintSizes();
 
-		var notes = h('textarea', { class: 'iaq-input', rows: '2', placeholder: 'Anything else about this item? (names/numbers, ink colours, etc.)', oninput: function (e) { it.notes = e.target.value; } });
+		var notes = h('textarea', { class: 'iaq-input', rows: '2', placeholder: 'Anything else about this item? (names/numbers, ink colors, etc.)', oninput: function (e) { it.notes = e.target.value; } });
 		notes.value = it.notes || '';
 
 		var errEl = h('div', { class: 'iaq-error', role: 'alert' });
@@ -933,7 +933,7 @@
 
 		add(root, [
 			cartBar(),
-			h('div', { class: 'iaq-steps' }, step(1, 'Choose a product'), step(2, 'Colour, sizes & logo', true), step(3, 'Send request')),
+			h('div', { class: 'iaq-steps' }, step(1, 'Choose a product'), step(2, 'Color, sizes & logo', true), step(3, 'Send request')),
 			h('button', { type: 'button', class: 'iaq-link', onclick: function () { S.cur = null; S.screen = S.items.length && typeof it.editIndex === 'number' ? 'review' : 'browse'; render(); } }, '← Back'),
 			h('div', { class: 'iaq-product' },
 				h('div', { class: 'iaq-stage' },
@@ -948,7 +948,7 @@
 					h('div', { class: 'iaq-brand' }, st.b + ' · Style ' + st.s),
 					h('h3', { class: 'iaq-title' }, st.t),
 					desc,
-					h('div', { class: 'iaq-group' }, h('div', { class: 'iaq-label' }, 'Colour: ', colorName), swatches),
+					h('div', { class: 'iaq-group' }, h('div', { class: 'iaq-label' }, 'Color: ', colorName), swatches),
 					h('div', { class: 'iaq-group' }, h('div', { class: 'iaq-label' }, 'Decoration'), methodBox, colorsWrap),
 					h('div', { class: 'iaq-group' }, h('div', { class: 'iaq-label' }, 'Logo placement'), placeBox),
 					h('div', { class: 'iaq-group' }, h('div', { class: 'iaq-label' }, 'Quantity per size'), sizesBox, totalEl),
@@ -1001,7 +1001,7 @@
 				itemThumb(it),
 				h('div', { class: 'iaq-item-body' },
 					h('div', { class: 'iaq-item-title' }, it.brand + ' ' + it.style + ' - ' + it.title),
-					h('div', null, 'Colour: ', h('strong', null, it.color)),
+					h('div', null, 'Color: ', h('strong', null, it.color)),
 					h('div', null, 'Sizes: ', sizes, ' (', h('strong', null, it.total + ' pcs'), ')'),
 					h('div', null, 'Decoration: ' + methodText(it.method) + (it.placements.length ? ' - ' + it.placements.join(', ') : '')),
 					h('div', { class: 'iaq-item-actions' },
@@ -1075,7 +1075,7 @@
 		);
 
 		add(root, [
-			h('div', { class: 'iaq-steps' }, step(1, 'Choose a product'), step(2, 'Colour, sizes & logo'), step(3, 'Send request', true)),
+			h('div', { class: 'iaq-steps' }, step(1, 'Choose a product'), step(2, 'Color, sizes & logo'), step(3, 'Send request', true)),
 			h('div', { class: 'iaq-review-head' },
 				h('h3', null, 'Your request'),
 				h('button', { type: 'button', class: 'iaq-btn', onclick: function () { S.screen = 'browse'; render(); scrollTop(); } }, '+ Add another product')),
