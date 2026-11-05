@@ -134,6 +134,13 @@
 	/* State                                                               */
 	/* ------------------------------------------------------------------ */
 
+	// Links from the catalogue page: ?style=PC54 opens that product, ?cat=T-Shirts opens a category.
+	try {
+		var qs = new URLSearchParams(window.location.search);
+		if (!CFG.startStyle && qs.get('style')) { CFG.startStyle = qs.get('style'); }
+		if (!CFG.startCat && qs.get('cat')) { CFG.startCat = qs.get('cat'); }
+	} catch (e) {}
+
 	var S = {
 		catalog: null,
 		screen: 'browse',
@@ -554,6 +561,7 @@
 					logo_colors: '', notes: '', tf: {}, view: 'front', active: defaultPlacement(st.c)
 				};
 			}
+			if (!S.browse.cat && CFG.startStyle && st.s === CFG.startStyle) { S.browse.cat = st.c; }
 			S.screen = 'product';
 			render();
 			scrollTop();
@@ -1180,7 +1188,10 @@
 			.forEach(function (k) { ordered[k] = cat.categories[k]; });
 		cat.categories = ordered;
 		S.catalog = cat;
-		if (S.browse.cat && !cat.categories[S.browse.cat]) { S.browse.cat = ''; }
+		if (S.browse.cat && !cat.categories[S.browse.cat]) {
+			var want = String(S.browse.cat).toLowerCase().replace(/[^a-z0-9]+/g, '');
+			S.browse.cat = Object.keys(cat.categories).filter(function (c) { return c.toLowerCase().replace(/[^a-z0-9]+/g, '') === want; })[0] || '';
+		}
 		if (CFG.startStyle) { openStyle(CFG.startStyle); return; }
 		render();
 	}).catch(function () {
