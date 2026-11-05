@@ -261,7 +261,7 @@ class IAQ_Quotes {
 			}
 		}
 		if ( ! $col ) {
-			return self::err( sprintf( 'Please choose a colour for %s.', $style['s'] ) );
+			return self::err( sprintf( 'Please choose a color for %s.', $style['s'] ) );
 		}
 		$sizes = array();
 		$total = 0;
@@ -456,14 +456,14 @@ class IAQ_Quotes {
 			}
 			$out .= '<div style="border:1px solid #ddd;border-radius:8px;padding:12px 14px;margin:0 0 12px">';
 			$out .= '<div style="font:bold 15px/1.4 Arial,sans-serif">' . ( $i + 1 ) . '. ' . esc_html( $it['brand'] . ' ' . $it['style'] ) . ' - ' . esc_html( $it['title'] ) . '</div>';
-			$out .= '<div style="font:14px/1.6 Arial,sans-serif">Colour: <strong>' . esc_html( $it['color'] ) . '</strong><br>';
+			$out .= '<div style="font:14px/1.6 Arial,sans-serif">Color: <strong>' . esc_html( $it['color'] ) . '</strong><br>';
 			$out .= 'Sizes: ' . implode( ' &nbsp; ', $sizes ) . ' &nbsp; (total <strong>' . (int) $it['total'] . '</strong>)<br>';
 			$out .= 'Decoration: ' . esc_html( $it['method_txt'] );
 			if ( $it['placements'] ) {
 				$out .= ' - ' . esc_html( implode( ', ', $it['placements'] ) );
 			}
 			if ( ! empty( $it['colors_in_logo'] ) ) {
-				$out .= '<br>Colours in logo: ' . esc_html( $it['colors_in_logo'] );
+				$out .= '<br>Colors in logo: ' . esc_html( $it['colors_in_logo'] );
 			}
 			if ( $it['notes'] ) {
 				$out .= '<br>Notes: ' . nl2br( esc_html( $it['notes'] ) );
