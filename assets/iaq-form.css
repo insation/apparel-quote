@@ -181,3 +181,5 @@
 .iaq-cat-card .iaq-card-title { font-size: 17px; }
 .iaq-pager { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 26px 0 8px; }
 .iaq-pager-info { font-size: 14px; color: var(--iaq-muted); }
+
+.iaq-catalog{scroll-margin-top:120px}
