@@ -122,6 +122,9 @@ class IAQ_Admin {
 			</form>
 
 			<hr>
+			<?php IAQ_Log::render_section(); ?>
+
+			<hr>
 			<h2>Product photos</h2>
 			<?php
 			$ps    = IAQ_Images::state();
