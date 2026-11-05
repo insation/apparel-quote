@@ -2,7 +2,7 @@
 Contributors: insationtech
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.0.6
+Stable tag: 1.0.7
 License: GPLv2 or later
 
 Customers pick a SanMar product, colour and size quantities, upload their logo, see a live mockup on the real product photo, and send a quote request. No prices are shown.
@@ -10,7 +10,7 @@ Customers pick a SanMar product, colour and size quantities, upload their logo, 
 == Setup ==
 
 1. Upload and activate. The SanMar catalog bundled in data/catalog.json.gz (SanMar Data Library, 3 Nov 2026, discontinued items removed) is imported on activation.
-2. Add [apparel_quote] to a page (Elementor: Shortcode widget).
+2. Add [apparel_quote] to a page (Elementor: Shortcode widget). Optional catalogue page: [apparel_catalog] (category tiles, product lists with search, brand filter and pages; each product opens the quote form on that product via ?style=).
    Optional: [apparel_quote category="Caps"] or [apparel_quote style="PC54"].
 3. Quote Requests > Settings: set the email address requests go to, and pick which categories to show.
 
