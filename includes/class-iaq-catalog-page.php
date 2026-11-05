@@ -97,7 +97,7 @@ class IAQ_Catalog_Page {
 		$cat      = isset( $slugs[ $cat_slug ] ) ? $slugs[ $cat_slug ] : '';
 
 		ob_start();
-		echo '<div class="iaq iaq-catalog">';
+		echo '<div class="iaq iaq-catalog" id="iaq-catalog">';
 		if ( ! $cat && '' === $q ) {
 			self::render_categories( $ix, $cats );
 		} else {
@@ -110,7 +110,7 @@ class IAQ_Catalog_Page {
 	private static function search_form( $cat, $q, $brand = '', $brands = array() ) {
 		$base = remove_query_arg( array( 'cat', 'q', 'brand', 'pg' ) );
 		?>
-		<form class="iaq-cat-search" method="get" action="<?php echo esc_url( $base ); ?>">
+		<form class="iaq-cat-search" method="get" action="<?php echo esc_url( $base . '#iaq-catalog' ); ?>">
 			<?php if ( $cat ) : ?>
 				<input type="hidden" name="cat" value="<?php echo esc_attr( sanitize_title( $cat ) ); ?>">
 			<?php endif; ?>
@@ -141,7 +141,7 @@ class IAQ_Catalog_Page {
 		self::search_form( '', '' );
 		echo '<div class="iaq-grid iaq-cat-grid">';
 		foreach ( $cats as $c ) {
-			$url = add_query_arg( 'cat', sanitize_title( $c ), $base );
+			$url = add_query_arg( 'cat', sanitize_title( $c ), $base ) . '#iaq-catalog';
 			echo '<a class="iaq-card iaq-cat-card" href="' . esc_url( $url ) . '">';
 			echo '<span class="iaq-card-img">';
 			if ( ! empty( $first[ $c ] ) ) {
@@ -213,7 +213,7 @@ class IAQ_Catalog_Page {
 		$base  = remove_query_arg( array( 'cat', 'q', 'brand', 'pg' ) );
 		$quote = self::quote_url();
 
-		echo '<p class="iaq-crumbs"><a href="' . esc_url( $base ) . '">All categories</a>';
+		echo '<p class="iaq-crumbs"><a href="' . esc_url( $base . '#iaq-catalog' ) . '">All categories</a>';
 		if ( $cat ) {
 			echo ' &rsaquo; <span>' . esc_html( $cat ) . '</span>';
 		}
@@ -224,7 +224,7 @@ class IAQ_Catalog_Page {
 		echo '<div class="iaq-pills">';
 		foreach ( $cats as $c ) {
 			$on = $c === $cat ? ' is-on' : '';
-			echo '<a class="iaq-pill' . esc_attr( $on ) . '" href="' . esc_url( add_query_arg( 'cat', sanitize_title( $c ), $base ) ) . '">' . esc_html( $c ) . '</a>';
+			echo '<a class="iaq-pill' . esc_attr( $on ) . '" href="' . esc_url( add_query_arg( 'cat', sanitize_title( $c ), $base ) . '#iaq-catalog' ) . '">' . esc_html( $c ) . '</a>';
 		}
 		echo '</div>';
 
@@ -261,11 +261,11 @@ class IAQ_Catalog_Page {
 				)
 			);
 			if ( $page > 1 ) {
-				echo '<a class="iaq-btn iaq-btn-sm" href="' . esc_url( add_query_arg( array_merge( $args, array( 'pg' => $page - 1 ) ), $base ) ) . '">&larr; Previous</a>';
+				echo '<a class="iaq-btn iaq-btn-sm" href="' . esc_url( add_query_arg( array_merge( $args, array( 'pg' => $page - 1 ) ), $base ) . '#iaq-catalog' ) . '">&larr; Previous</a>';
 			}
 			echo '<span class="iaq-pager-info">Page ' . (int) $page . ' of ' . (int) $pages . '</span>';
 			if ( $page < $pages ) {
-				echo '<a class="iaq-btn iaq-btn-sm" href="' . esc_url( add_query_arg( array_merge( $args, array( 'pg' => $page + 1 ) ), $base ) ) . '">Next &rarr;</a>';
+				echo '<a class="iaq-btn iaq-btn-sm" href="' . esc_url( add_query_arg( array_merge( $args, array( 'pg' => $page + 1 ) ), $base ) . '#iaq-catalog' ) . '">Next &rarr;</a>';
 			}
 			echo '</nav>';
 		}
