@@ -3,7 +3,7 @@
  * SanMar catalog storage and lookups.
  *
  * Data comes from a trimmed copy of the SanMar Data Library (SDL) bundled at
- * data/catalog.json.gz. Each row of the table is one style; colours, sizes and
+ * data/catalog.json.gz. Each row of the table is one style; colors, sizes and
  * image paths are kept as JSON in the `data` column.
  */
 
@@ -345,7 +345,7 @@ class IAQ_Catalog {
 
 	/**
 	 * Compact product list for the browser:
-	 * { img, cats:[...], counts:[...], brands:[...], rows:[[style,title,brandIdx,catIdx,subcat,isNew,thumb,colours],...] }
+	 * { img, cats:[...], counts:[...], brands:[...], rows:[[style,title,brandIdx,catIdx,subcat,isNew,thumb,colors],...] }
 	 */
 	public static function compact_index() {
 		$ix     = self::index();
