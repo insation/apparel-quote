@@ -166,3 +166,18 @@
 	.iaq-cartbar { border-radius: 16px; }
 	.iaq .iaq-title { font-size: 22px; }
 }
+
+/* Catalogue page */
+.iaq a.iaq-card, .iaq a.iaq-pill { text-decoration: none; }
+.iaq a.iaq-card:hover .iaq-card-cta { background: var(--iaq-accent-dark); border-color: var(--iaq-accent-dark); }
+.iaq .iaq-card-cta { margin-top: 8px; align-self: flex-start; pointer-events: none; }
+.iaq-cat-search { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0 14px; }
+.iaq-cat-search .iaq-search { flex: 1 1 320px; width: auto; }
+.iaq-cat-search .iaq-brand-select { flex: 0 1 220px; border-radius: 999px; }
+.iaq-crumbs { font-size: 14px; color: var(--iaq-muted); margin: 0 0 4px; }
+.iaq-crumbs a { color: var(--iaq-accent); }
+.iaq .iaq-cat-title { margin: 0 0 10px; font-size: 30px; }
+.iaq-cat-grid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+.iaq-cat-card .iaq-card-title { font-size: 17px; }
+.iaq-pager { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 26px 0 8px; }
+.iaq-pager-info { font-size: 14px; color: var(--iaq-muted); }
