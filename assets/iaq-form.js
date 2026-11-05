@@ -127,6 +127,7 @@
 	var METHODS = [
 		{ v: 'embroidery', t: 'Embroidery' },
 		{ v: 'dtf', t: 'DTF / heat transfer' },
+		{ v: 'dtg', t: 'DTG / direct-to-garment' },
 		{ v: 'unsure', t: 'Not sure - recommend for me' }
 	];
 
