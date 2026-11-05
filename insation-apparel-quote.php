@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name:       Apparel Quote & Mockup (SanMar)
- * Description:       Customers pick a SanMar product, colour and size quantities, upload their logo, see a live mockup and send a quote request. No prices are shown. Shortcodes: [apparel_quote] (form), [apparel_catalog] (catalogue)
- * Version:           1.0.8
+ * Description:       Customers pick a SanMar product, color and size quantities, upload their logo, see a live mockup and send a quote request. No prices are shown. Shortcodes: [apparel_quote] (form), [apparel_catalog] (catalog)
+ * Version:           1.0.9
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Insation Technologies
@@ -13,7 +13,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'IAQ_VERSION', '1.0.8' );
+define( 'IAQ_VERSION', '1.0.9' );
 define( 'IAQ_FILE', __FILE__ );
 define( 'IAQ_DIR', plugin_dir_path( __FILE__ ) );
 define( 'IAQ_URL', plugin_dir_url( __FILE__ ) );
@@ -38,7 +38,7 @@ function iaq_settings() {
 		'hidden_categories' => array( 'Personal Protection' ),
 		'hidden_styles'     => '',
 		'max_upload_mb'     => 15,
-		'intro_text'        => 'Pick a product, choose your colour and sizes, upload your logo to see how it looks, and send us your request. We will get back to you with a quote.',
+		'intro_text'        => 'Pick a product, choose your color and sizes, upload your logo to see how it looks, and send us your request. We will get back to you with a quote.',
 		'thank_you_text'    => 'Thanks! We received your request and will get back to you with a quote shortly.',
 	);
 	$saved = get_option( 'iaq_settings', array() );
