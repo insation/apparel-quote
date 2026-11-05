@@ -283,6 +283,7 @@ class IAQ_Quotes {
 		$methods = array(
 			'embroidery' => 'Embroidery',
 			'dtf'        => 'DTF / heat transfer',
+			'dtg'        => 'DTG / direct-to-garment',
 			'unsure'     => 'Not sure - recommend',
 		);
 		$method = isset( $it['method'], $methods[ $it['method'] ] ) ? $it['method'] : 'unsure';
