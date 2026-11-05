@@ -3,7 +3,7 @@
  * REST endpoints used by the quote form.
  *
  *   GET  /iaq/v1/catalog        light list of all visible styles
- *   GET  /iaq/v1/style/{style}  colours, sizes and image paths for one style
+ *   GET  /iaq/v1/style/{style}  colors, sizes and image paths for one style
  *   GET  /iaq/v1/img?p=...      same-origin copy of a SanMar product image (lets the
  *                               browser export the mockup canvas as a PNG)
  *   GET  /iaq/v1/token          fresh form token (works behind page caching)
